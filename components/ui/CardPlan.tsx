@@ -1,0 +1,146 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { IconCheck } from "./IconCheck";
+import { Tag } from "./Tag";
+
+export type CardPlanState = "default" | "selected";
+
+export type CardPlanSpec = { label: string; value: ReactNode };
+
+export type CardPlanProps = {
+  /** Text: 요금제 이름 */
+  name: ReactNode;
+  /** Text: 설명 (없으면 숨김) */
+  desc?: ReactNode;
+  /** Text: 강조 금액 (예: "59,000원") */
+  price: ReactNode;
+  /** 금액 앞 라벨 (기본 "매달 내는 돈") */
+  priceLabel?: string;
+  /** 금액 아래 보조 문구 (예: "24개월 후 월 69,000원"). 없으면 숨김 */
+  priceCaption?: ReactNode;
+  /** Text: 원래 금액 — 값을 줄 때만 표시 */
+  original?: ReactNode;
+  /** Text: 차액 표시 — 값을 줄 때만 표시 */
+  discount?: ReactNode;
+  /** Boolean Badge — 강조 Tag (기본 문구 "추천") */
+  badge?: boolean;
+  badgeLabel?: string;
+  /** Boolean Promo — 기간 안내 줄 (promoText) */
+  promo?: boolean;
+  /** Promo 문구 (예: "가입 후 24개월 동안"). promo를 생략하고 이것만 줘도 표시된다 */
+  promoText?: ReactNode;
+  /** Boolean Sale — 판매 표시 Tag (saleLabel) */
+  sale?: boolean;
+  saleLabel?: string;
+  /** 유형 Tag 문구 (예: "기본형") */
+  typeLabel?: ReactNode;
+  /** 데이터 · 소진 후 속도 같은 짧은 줄 */
+  specs?: CardPlanSpec[];
+  /** Variant State — 선택 가능한 카드에서만 selected */
+  state?: CardPlanState;
+  /** 카드 전체 링크 */
+  href?: string;
+  replace?: boolean;
+  /** 카드 이름의 제목 수준 (기본 h2) */
+  headingLevel?: "h2" | "h3";
+  className?: string;
+};
+
+/**
+ * Card/Plan — Design.md 4장 (Name · Desc · Discount · Price · Original, Badge · Promo · Sale, State).
+ * 폭 358(부모 폭 채움), 기본 높이 223 기준. 부가 정보는 기본으로 모두 꺼져 있다.
+ */
+export function CardPlan({
+  name,
+  desc,
+  price,
+  priceLabel = "매달 내는 돈",
+  priceCaption,
+  original,
+  discount,
+  badge = false,
+  badgeLabel = "추천",
+  promo,
+  promoText,
+  sale = false,
+  saleLabel = "",
+  typeLabel,
+  specs,
+  state = "default",
+  href,
+  replace,
+  headingLevel = "h2",
+  className = "",
+}: CardPlanProps) {
+  const selected = state === "selected";
+  const showPromo = (promo ?? promoText !== undefined) && promoText !== undefined;
+  const showTags = typeLabel !== undefined || badge || (sale && saleLabel);
+  const Heading = headingLevel;
+
+  const body = (
+    <>
+      {(showTags || selected) && (
+        <div className="flex flex-wrap items-center gap-4">
+          {typeLabel !== undefined && <Tag label={typeLabel} />}
+          {badge && <Tag label={badgeLabel} tone="accent" />}
+          {sale && saleLabel && <Tag label={saleLabel} tone="accent" />}
+          {selected && (
+            <span className="ml-auto inline-flex items-center gap-4 text-caption-bold text-text-accent">
+              <IconCheck className="size-16" />
+              선택됨
+            </span>
+          )}
+        </div>
+      )}
+
+      <Heading className="text-heading-h4 text-text-primary">{name}</Heading>
+
+      {specs && specs.length > 0 && (
+        <dl className="flex flex-col gap-4 border-t border-border-subtle pt-12">
+          {specs.map((s) => (
+            <div key={s.label} className="flex items-center justify-between gap-8">
+              <dt className="text-caption-medium text-text-tertiary">{s.label}</dt>
+              <dd className="text-body-small-strong text-text-primary">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      <div className="flex flex-col gap-4 border-t border-border-subtle pt-12">
+        {showPromo && <p className="text-caption-medium text-text-accent">{promoText}</p>}
+        <div className="flex flex-wrap items-baseline gap-8">
+          <span className="text-caption-medium text-text-tertiary">{priceLabel}</span>
+          {original !== undefined && (
+            <s className="text-caption-medium text-text-tertiary">{original}</s>
+          )}
+          {discount !== undefined && <span className="text-caption-bold text-text-accent">{discount}</span>}
+          <span className="text-heading-h3 text-text-primary">{price}</span>
+        </div>
+        {priceCaption !== undefined && <p className="text-caption-medium text-text-tertiary">{priceCaption}</p>}
+      </div>
+
+      {desc !== undefined && <p className="text-body-small-medium text-text-secondary">{desc}</p>}
+    </>
+  );
+
+  const cls = [
+    "flex w-full flex-col gap-12 rounded-16 bg-bg-surface p-20 text-left",
+    selected ? "border-2 border-border-strong" : "border border-border-default",
+    className,
+  ].join(" ");
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        replace={replace}
+        aria-current={selected || undefined}
+        className={`${cls} transition-colors hover:border-border-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus`}
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return <article className={cls}>{body}</article>;
+}

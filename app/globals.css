@@ -1,26 +1,18 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* 텍스트 스타일 · 색 · 간격 · 모서리는 tokens.css(@theme)에서 온다. 여기에는 기본 요소 설정만 둔다. */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* layout.tsx의 Pretendard Variable(next/font/local) → tokens.css의 --font-sans 순서로 쓴다 */
+  font-family: var(--font-pretendard), var(--font-sans);
+  background-color: var(--color-bg-default);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  word-break: keep-all;
 }
