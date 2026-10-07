@@ -10,23 +10,82 @@ import { IconDoneMark } from "@/components/ui/IconDoneMark";
 import { InlineError } from "@/components/ui/InlineError";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Toast } from "@/components/ui/Toast";
-import { clearLastSubscription, parseLastSubscription, readLastSubscriptionRaw } from "@/lib/last-subscription";
-import { formatDateTime, maskName, maskPhone } from "@/lib/mask";
-import { findPlan } from "@/lib/plan-data";
+import { clearLastSubscription, isUuid, readLastSubscriptionId } from "@/lib/last-subscription";
+import { formatDateTime } from "@/lib/mask";
 import { PLAN_LIST_PATH, formatWon } from "@/lib/plan-display";
+import type { SubscriptionView } from "@/lib/subscription";
 import { ReceiptBox } from "./receipt-box";
 
 const HOME_LABEL = "처음으로";
 
 // sessionStorage는 같은 탭에서 바뀌어도 알림이 없으므로 구독할 것이 없다.
-// 서버 · 첫 렌더(hydration)는 undefined → 로딩 상태, 그 뒤 클라이언트에서 값을 읽는다.
+// 서버 · 첫 렌더(hydration)는 undefined → 로딩 상태, 그 뒤 클라이언트에서 id를 읽는다.
 const noopSubscribe = () => () => {};
 const getServerSnapshot = (): string | null | undefined => undefined;
 
+/** 화면에 보여 줄 값 — API가 가린 이름 · 휴대폰만 받는다 */
+type Receipt = {
+  applicationNo: string;
+  planName: string;
+  monthly: string;
+  maskedName: string;
+  maskedPhone: string;
+  createdAt: string;
+};
+
+type Fetched = { id: string; result: { status: "ok"; data: Receipt } | { status: "error" } };
+
+/** API 응답 → 화면 값. 형태가 맞지 않거나 접수(received) 상태가 아니면 null */
+function toReceipt(v: unknown): Receipt | null {
+  if (typeof v !== "object" || v === null) return null;
+  const s = v as Partial<Record<keyof SubscriptionView, unknown>>;
+  if (
+    typeof s.application_no !== "string" ||
+    !/^SUB-\d{6}$/.test(s.application_no) ||
+    typeof s.plan_name !== "string" ||
+    typeof s.promo_price !== "number" ||
+    typeof s.name_masked !== "string" ||
+    typeof s.phone_masked !== "string" ||
+    s.status !== "received" ||
+    typeof s.created_at !== "string"
+  ) {
+    return null;
+  }
+  const createdAt = formatDateTime(s.created_at);
+  if (!createdAt) return null;
+  return {
+    applicationNo: s.application_no,
+    planName: s.plan_name,
+    monthly: formatWon(s.promo_price),
+    maskedName: s.name_masked,
+    maskedPhone: s.phone_masked,
+    createdAt,
+  };
+}
+
+async function fetchReceipt(id: string, signal: AbortSignal): Promise<Receipt | null> {
+  const res = await fetch(`/api/subscriptions?id=${encodeURIComponent(id)}`, { cache: "no-store", signal });
+  if (!res.ok) return null;
+  return toReceipt(await res.json());
+}
+
 export function CompleteView() {
   const router = useRouter();
-  const raw = useSyncExternalStore(noopSubscribe, readLastSubscriptionRaw, getServerSnapshot);
+  const id = useSyncExternalStore(noopSubscribe, readLastSubscriptionId, getServerSnapshot);
+  const [fetched, setFetched] = useState<Fetched | null>(null);
   const [toastOpen, setToastOpen] = useState(false);
+
+  // id가 있으면 API에서 그 1건(가린 값)을 불러온다. 잘못된 id는 요청 없이 에러 상태.
+  useEffect(() => {
+    if (!id || !isUuid(id)) return;
+    const controller = new AbortController();
+    fetchReceipt(id, controller.signal)
+      .then((data) => setFetched({ id, result: data ? { status: "ok", data } : { status: "error" } }))
+      .catch(() => {
+        if (!controller.signal.aborted) setFetched({ id, result: { status: "error" } });
+      });
+    return () => controller.abort();
+  }, [id]);
 
   // 브라우저 뒤로 → 요금제 목록. 신청 화면은 replace로 빠져 있지만 그 앞(변경 전 확인)이 남아 있으므로
   // 진입 시 기록을 한 칸 쌓고, 그 칸을 벗어나는 뒤로 가기를 목록 이동으로 바꾼다. 다시 저장하지 않는다.
@@ -58,8 +117,10 @@ export function CompleteView() {
     </>
   );
 
-  // 로딩: sessionStorage를 읽기 전
-  if (raw === undefined) {
+  const result = id && !isUuid(id) ? { status: "error" as const } : fetched && fetched.id === id ? fetched.result : undefined;
+
+  // 로딩: sessionStorage를 읽기 전 · API 응답 전
+  if (id === undefined || (id && result === undefined)) {
     return (
       <>
         <main className="flex flex-1 flex-col px-16 pt-40 pb-24">
@@ -70,9 +131,8 @@ export function CompleteView() {
     );
   }
 
-  const parsed = parseLastSubscription(raw);
-
-  if (parsed.status === "empty") {
+  // 빈: 넘겨받은 id 없음
+  if (!id) {
     return (
       <>
         <main className="flex flex-1 flex-col px-16 pt-40 pb-24">
@@ -83,11 +143,10 @@ export function CompleteView() {
     );
   }
 
-  const sub = parsed.status === "ok" ? parsed.data : null;
-  const plan = sub ? findPlan(sub.plan_id) : undefined;
-  const createdAt = sub ? formatDateTime(sub.created_at) : null;
+  const receipt = result?.status === "ok" ? result.data : null;
 
-  if (!sub || !plan || !createdAt) {
+  // 에러: 404 · 500 · 네트워크 · 응답 형태 이상
+  if (!receipt) {
     return (
       <>
         <main className="flex flex-1 flex-col px-16 pt-40 pb-24">
@@ -99,9 +158,9 @@ export function CompleteView() {
   }
 
   async function onCopy() {
-    if (!sub) return;
+    if (!receipt) return;
     try {
-      await navigator.clipboard.writeText(sub.application_no);
+      await navigator.clipboard.writeText(receipt.applicationNo);
       setToastOpen(true);
     } catch {
       // 클립보드를 쓸 수 없는 환경: 번호는 화면에 그대로 보인다
@@ -116,12 +175,12 @@ export function CompleteView() {
       </div>
       <main className="flex flex-1 flex-col gap-24 px-16 pt-16 pb-24">
         <ReceiptBox
-          applicationNo={sub.application_no}
-          planName={plan.name}
-          monthly={formatWon(plan.promo_price)}
-          maskedName={maskName(sub.name)}
-          maskedPhone={maskPhone(sub.phone)}
-          createdAt={createdAt}
+          applicationNo={receipt.applicationNo}
+          planName={receipt.planName}
+          monthly={receipt.monthly}
+          maskedName={receipt.maskedName}
+          maskedPhone={receipt.maskedPhone}
+          createdAt={receipt.createdAt}
           onCopy={() => void onCopy()}
         />
 
