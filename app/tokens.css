@@ -1,0 +1,120 @@
+/* 자동 생성 파일 — 직접 고치지 마세요.
+ * 원본: docs/tokens.json(색·간격·모서리·서체) + docs/Design.md 2장(텍스트 스타일) → node checks/gen-tokens.mjs */
+@theme {
+  /* 기본 테마 값을 지우고 토큰만 남긴다 */
+  --color-*: initial;
+  --spacing-*: initial;
+  --radius-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+
+  /* color — semantic (bg-bg-surface, text-text-primary, border-border-default …) */
+  --color-text-primary: #181A1B;
+  --color-text-secondary: #66707A;
+  --color-text-tertiary: #878787;
+  --color-text-on-dark: #FFFFFF;
+  --color-text-accent: #FF2E98;
+  --color-text-error: #E30036;
+  --color-text-placeholder: #B7BDC4;
+  --color-text-on-disabled: #66707A;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-default: #F7F7F7;
+  --color-bg-subtle: #EFF1F3;
+  --color-bg-inverse: #2D2D2D;
+  --color-bg-accent-subtle: #FFF5FA;
+  --color-bg-error-subtle: #FFF0F3;
+  --color-border-default: #D9DCDF;
+  --color-border-subtle: #EFF1F3;
+  --color-border-strong: #181A1B;
+  --color-border-divider: #0000001A;
+  --color-border-focus: #FF2E98;
+  --color-border-error: #E30036;
+  --color-fill-primary: #FF2E98;
+  --color-fill-secondary: #181A1B;
+  --color-fill-tertiary: #EFF1F3;
+  --color-fill-disabled: #D9DCDF;
+  --color-fill-disabled-strong: #B7BDC4;
+  --color-fill-primary-hover: #E6007E;
+  --color-icon-default: #66707A;
+  --color-icon-strong: #181A1B;
+  --color-border-medium: #66707A;
+  --color-surface-default: #FFFFFF;
+  --color-icon-accent: #FF2E98;
+  --color-icon-on-dark: #FFFFFF;
+  --color-icon-disabled: #D9DCDF;
+  --color-icon-error: #E30036;
+  --color-icon-primary: #000000;
+  --color-brand-primary: #FF2E98;
+
+  /* spacing (p-16, gap-12 …) */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-10: 10px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-80: 80px;
+
+  /* radius (rounded-16, rounded-full …) */
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-24: 24px;
+  --radius-32: 32px;
+  --radius-full: 9999px;
+
+  --font-sans: "Pretendard Variable", system-ui, sans-serif;
+
+  /* typography — Design.md 2장 (text-heading-h1, text-body-medium, text-caption-small …: 크기+줄높이+굵기) */
+  --text-heading-h1: 32px;
+  --text-heading-h1--line-height: 44px;
+  --text-heading-h1--font-weight: 700;
+  --text-heading-h2: 28px;
+  --text-heading-h2--line-height: 40px;
+  --text-heading-h2--font-weight: 700;
+  --text-heading-h3: 24px;
+  --text-heading-h3--line-height: 32px;
+  --text-heading-h3--font-weight: 700;
+  --text-heading-h4: 20px;
+  --text-heading-h4--line-height: 28px;
+  --text-heading-h4--font-weight: 500;
+  --text-subtitle-bold: 18px;
+  --text-subtitle-bold--line-height: 26px;
+  --text-subtitle-bold--font-weight: 700;
+  --text-subtitle-default: 18px;
+  --text-subtitle-default--line-height: 26px;
+  --text-subtitle-default--font-weight: 600;
+  --text-body-strong: 16px;
+  --text-body-strong--line-height: 24px;
+  --text-body-strong--font-weight: 600;
+  --text-body-medium: 16px;
+  --text-body-medium--line-height: 24px;
+  --text-body-medium--font-weight: 500;
+  --text-body-small-strong: 14px;
+  --text-body-small-strong--line-height: 21px;
+  --text-body-small-strong--font-weight: 600;
+  --text-body-small-medium: 14px;
+  --text-body-small-medium--line-height: 21px;
+  --text-body-small-medium--font-weight: 500;
+  --text-caption-bold: 13px;
+  --text-caption-bold--line-height: 18px;
+  --text-caption-bold--font-weight: 700;
+  --text-caption-medium: 13px;
+  --text-caption-medium--line-height: 18px;
+  --text-caption-medium--font-weight: 500;
+  --text-caption-small-bold: 12px;
+  --text-caption-small-bold--line-height: 16px;
+  --text-caption-small-bold--font-weight: 700;
+  --text-caption-small: 12px;
+  --text-caption-small--line-height: 16px;
+  --text-caption-small--font-weight: 500;
+  --text-caption-mini: 10px;
+  --text-caption-mini--line-height: 14px;
+  --text-caption-mini--font-weight: 600;
+}
