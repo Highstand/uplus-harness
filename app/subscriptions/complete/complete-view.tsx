@@ -6,7 +6,6 @@ import { BottomCTA, BottomCTASpacer } from "@/components/ui/BottomCTA";
 import { Button } from "@/components/ui/Button";
 import { CautionNotice } from "@/components/ui/CautionNotice";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Header } from "@/components/ui/Header";
 import { IconDoneMark } from "@/components/ui/IconDoneMark";
 import { InlineError } from "@/components/ui/InlineError";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -111,10 +110,10 @@ export function CompleteView() {
 
   return (
     <>
-      <div className="flex justify-center px-16 pt-40 pb-16">
+      <div className="flex flex-col items-center gap-12 px-16 pt-40 pb-16">
         <IconDoneMark />
+        <h1 className="text-center text-heading-h3 text-text-primary">요금제 변경 신청이 접수됐어요</h1>
       </div>
-      <Header type="root" title="요금제 변경 신청이 접수됐어요" />
       <main className="flex flex-1 flex-col gap-24 px-16 pt-16 pb-24">
         <ReceiptBox
           applicationNo={sub.application_no}
