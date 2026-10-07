@@ -3,26 +3,15 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { CardPlan } from "@/components/ui/CardPlan";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FilterChip, FilterChipGroup } from "@/components/ui/FilterChip";
 import { Header } from "@/components/ui/Header";
 import { InlineError } from "@/components/ui/InlineError";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { loadPlans } from "@/lib/plan-data";
-import {
-  PLAN_LIST_PATH,
-  PLAN_TYPES,
-  TYPE_LABEL,
-  afterPromoCaption,
-  formatData,
-  formatSpeed,
-  formatWon,
-  parseTypeFilter,
-  planDetailPath,
-  withType,
-} from "@/lib/plan-display";
+import { PLAN_LIST_PATH, PLAN_TYPES, TYPE_LABEL, parseTypeFilter, planDetailPath, withType } from "@/lib/plan-display";
 import type { PlanType } from "@/lib/plans";
+import { PlanListCard } from "./plan-list-card";
 
 const CHIPS: { type: PlanType | null; label: string }[] = [
   { type: null, label: "전체" },
@@ -88,28 +77,25 @@ export function PlansView() {
           />
         )}
 
-        {result.status === "empty" && <EmptyState message="이 유형의 요금제가 없어요." />}
+        {result.status !== "error" && (
+          <div className="flex flex-col gap-12">
+            {/* 개수 줄 (B2) — 필터 결과 개수 */}
+            <p className="text-caption-medium text-text-tertiary" aria-live="polite">
+              매달 내는 돈 낮은 순 · {result.status === "ok" ? result.data.length : 0}개
+            </p>
 
-        {result.status === "ok" && (
-          <ul className="flex flex-col gap-16" aria-label="요금제 목록">
-            {result.data.map((plan) => (
-              <li key={plan.id}>
-                <CardPlan
-                  href={withType(planDetailPath(plan.id), selected)}
-                  name={plan.name}
-                  typeLabel={TYPE_LABEL[plan.type]}
-                  badge={plan.is_recommended}
-                  specs={[
-                    { label: "기본 데이터", value: formatData(plan) },
-                    { label: "소진 후 속도", value: formatSpeed(plan) },
-                  ]}
-                  price={formatWon(plan.promo_price)}
-                  priceCaption={afterPromoCaption(plan)}
-                  desc={plan.description}
-                />
-              </li>
-            ))}
-          </ul>
+            {result.status === "empty" && <EmptyState message="이 유형의 요금제가 없어요." />}
+
+            {result.status === "ok" && (
+              <ul className="flex flex-col gap-16" aria-label="요금제 목록">
+                {result.data.map((plan) => (
+                  <li key={plan.id}>
+                    <PlanListCard plan={plan} href={withType(planDetailPath(plan.id), selected)} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </main>
     </>

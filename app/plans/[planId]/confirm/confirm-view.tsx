@@ -2,26 +2,20 @@
 
 import { useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { BottomCTA, BottomCTASpacer } from "@/components/ui/BottomCTA";
 import { Button } from "@/components/ui/Button";
-import { CardPlan } from "@/components/ui/CardPlan";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Header } from "@/components/ui/Header";
 import { InlineError } from "@/components/ui/InlineError";
 import { ListRow } from "@/components/ui/ListRow";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { loadPlan } from "@/lib/plan-data";
-import {
-  PLAN_LIST_PATH,
-  afterPromoCaption,
-  formatWon,
-  parseTypeFilter,
-  planApplyPath,
-  planDetailPath,
-  withType,
-} from "@/lib/plan-display";
+import { PLAN_LIST_PATH, parseTypeFilter, planApplyPath, planDetailPath, withType } from "@/lib/plan-display";
+import { ConfirmActions, ConfirmActionsSpacer } from "./confirm-actions";
+import { ConfirmSummary } from "./confirm-summary";
 
 const TITLE = "변경 전 확인";
+const PRIMARY_LABEL = "신청하기";
+const SECONDARY_LABEL = "다른 요금제 보기";
 
 // PRD 4-3 초안 문구 그대로 (확정 3). 숫자 금액을 넣지 않는다 (PRD 5).
 const NOTICES = [
@@ -42,16 +36,16 @@ const NOTICES = [
 function DisabledCTA() {
   return (
     <>
-      <BottomCTASpacer layout="double" />
-      <BottomCTA layout="double">
-        <Button type="Secondary" label="다른 요금제 보기" state="Disabled" />
-        <Button label="신청하기" state="Disabled" />
-      </BottomCTA>
+      <ConfirmActionsSpacer />
+      <ConfirmActions>
+        <Button label={PRIMARY_LABEL} state="Disabled" />
+        <Button type="Secondary" label={SECONDARY_LABEL} state="Disabled" />
+      </ConfirmActions>
     </>
   );
 }
 
-/** 로딩: Confirm Skeleton + BottomCTA 두 Button Disabled */
+/** 로딩: Confirm Skeleton + 하단 두 Button Disabled */
 export function ConfirmLoading() {
   return (
     <>
@@ -108,19 +102,25 @@ export function ConfirmView() {
       {/* 뒤로 → 요금제 상세 (?type= 유지, 기록 교체) */}
       <Header type="default" title={TITLE} backHref={detailHref} />
       <main className="flex flex-1 flex-col gap-24 px-16 pt-16 pb-24">
-        <CardPlan name={plan.name} price={formatWon(plan.promo_price)} priceCaption={afterPromoCaption(plan)} />
+        <ConfirmSummary plan={plan} />
 
-        <section aria-label="변경 전 안내" className="flex flex-col">
-          {NOTICES.map((n, i) => (
-            <ListRow key={n.label} type="desc" label={n.label} value={n.text} divider={i < NOTICES.length - 1} />
-          ))}
+        {/* 변경 전 안내 (B7) — 제목은 카드 밖, 안내 3항목은 흰 카드(bg/surface · radius/12) 안 */}
+        <section aria-labelledby="confirm-notice-title" className="flex flex-col gap-12">
+          <h2 id="confirm-notice-title" className="text-body-strong text-text-primary">
+            변경 전 안내
+          </h2>
+          <div className="flex flex-col rounded-12 bg-bg-surface px-20 py-4">
+            {NOTICES.map((n, i) => (
+              <ListRow key={n.label} type="desc" label={n.label} value={n.text} divider={i < NOTICES.length - 1} />
+            ))}
+          </div>
         </section>
       </main>
-      <BottomCTASpacer layout="double" />
-      <BottomCTA layout="double">
-        <Button type="Secondary" label="다른 요금제 보기" href={withType(PLAN_LIST_PATH, type)} />
-        <Button label="신청하기" href={withType(planApplyPath(plan.id), type)} />
-      </BottomCTA>
+      <ConfirmActionsSpacer />
+      <ConfirmActions>
+        <Button label={PRIMARY_LABEL} href={withType(planApplyPath(plan.id), type)} />
+        <Button type="Secondary" label={SECONDARY_LABEL} href={withType(PLAN_LIST_PATH, type)} />
+      </ConfirmActions>
     </>
   );
 }

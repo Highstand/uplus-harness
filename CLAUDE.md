@@ -45,6 +45,7 @@ docs/의 PRD·screens·Design·tokens를 읽어, screens.md의 화면을 Next.js
 
 - 오케스트레이터(메인 대화)는 직접 구현하지 않는다. 페이즈마다 3장의 담당 에이전트를 부르고, 게이트 실행 · 기록 · 커밋 · 실패 시 되돌아갈 페이즈 판단만 한다.
 - @screen-builder는 components/ui/를 고치지 않는다. 모자라면 보고 → 페이즈 3.
+- @screen-builder 입력에는 `reference/make-export`(특히 `src/App.tsx`)가 포함된다. 화면 레이아웃(화면 제목, 입력 라벨, 요약 영역 모양, 동의 행, 하단 버튼 배치)의 참고용이며, 코드는 복사하지 않고 구조만 참고한다. 컴포넌트는 components/ui 것만 쓴다. screens.md와 다르면 차이 목록을 먼저 사람에게 보여주고 확인을 받는다.
 - 판정용 약속은 하나뿐: `lib/plans.ts`가 `export const PLANS`를 PRD 5장 필드 이름 그대로 내보낸다 (id, name, regular_price, promo_price, promo_months, data_gb, speed_after, type, is_recommended, description). lib/plans.ts는 다른 파일을 import하지 않는다.
 
 ## 4. 게이트 조건

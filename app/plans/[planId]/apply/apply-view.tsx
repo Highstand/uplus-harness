@@ -4,19 +4,19 @@ import { useState, type ChangeEvent } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { BottomCTA, BottomCTASpacer } from "@/components/ui/BottomCTA";
 import { Button } from "@/components/ui/Button";
-import { CardPlan } from "@/components/ui/CardPlan";
-import { Checkbox } from "@/components/ui/Checkbox";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Header } from "@/components/ui/Header";
 import { InlineError } from "@/components/ui/InlineError";
 import { Input } from "@/components/ui/Input";
-import { OptionItem } from "@/components/ui/OptionItem";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { MESSAGES, NAME_MAX, canSubmit, formatPhoneInput, isValidName, isValidPhone } from "@/lib/apply-form";
 import { saveLastSubscription } from "@/lib/last-subscription";
 import { loadPlan } from "@/lib/plan-data";
-import { COMPLETE_PATH, PLAN_LIST_PATH, formatWon, parseTypeFilter, planDetailPath, withType } from "@/lib/plan-display";
+import { COMPLETE_PATH, PLAN_LIST_PATH, parseTypeFilter, planDetailPath, withType } from "@/lib/plan-display";
 import { submitSubscription } from "@/lib/subscription";
+import { ApplySummary } from "./apply-summary";
+import { CancelTextButton } from "./cancel-text-button";
+import { PrivacyAgreeRow } from "./privacy-agree-row";
 import { PrivacySheet } from "./privacy-sheet";
 
 const TITLE = "변경 신청";
@@ -68,7 +68,7 @@ export function ApplyView() {
     router.replace(detailHref);
   }
 
-  const cancelButton = <Button type="Secondary" size="sm" label="취소" fullWidth={false} onClick={onCancel} />;
+  const cancelButton = <CancelTextButton onClick={onCancel} />;
 
   if (result.status !== "ok") {
     // 잘못된 planId → 변경 전 확인의 빈 상태 문구 재사용 (페이즈 2 확정). 입력 폼 · BottomCTA 숨김
@@ -134,11 +134,14 @@ export function ApplyView() {
     <>
       <Header type="default" title={TITLE} right={cancelButton} />
       <main className="flex flex-1 flex-col gap-24 px-16 pt-16 pb-24">
-        <CardPlan name={plan.name} price={formatWon(plan.promo_price)} />
+        {/* 큰 제목 (B8) */}
+        <h2 className="whitespace-pre-line text-heading-h3 text-text-primary">{"신청 정보를\n입력해 주세요"}</h2>
+
+        <ApplySummary plan={plan} />
 
         <form
           noValidate
-          className="flex flex-col gap-16"
+          className="flex flex-col gap-24"
           onSubmit={(e) => {
             e.preventDefault();
             void onSubmit();
@@ -146,6 +149,7 @@ export function ApplyView() {
         >
           <Input
             label="이름"
+            showLabel
             placeholder="이름"
             type="text"
             autoComplete="name"
@@ -156,6 +160,7 @@ export function ApplyView() {
           />
           <Input
             label="휴대폰 번호"
+            showLabel
             placeholder="010-0000-0000"
             type="tel"
             inputMode="numeric"
@@ -166,22 +171,7 @@ export function ApplyView() {
             onBlur={onPhoneBlur}
             errorMessage={phoneError}
           />
-          <OptionItem
-            state={agreed ? "selected" : "default"}
-            leading={<Checkbox id={AGREE_ID} checked={agreed} onChange={setAgreed} required />}
-            title="[필수] 개인정보 수집·이용에 동의합니다"
-            labelFor={AGREE_ID}
-            trailing={
-              <Button
-                type="Secondary"
-                size="sm"
-                label="보기"
-                fullWidth={false}
-                aria-label="개인정보 수집·이용 내용 보기"
-                onClick={() => setSheetOpen(true)}
-              />
-            }
-          />
+          <PrivacyAgreeRow id={AGREE_ID} checked={agreed} onChange={setAgreed} onView={() => setSheetOpen(true)} />
         </form>
 
         {submitFailed && <InlineError message={MESSAGES.submitFailed} />}

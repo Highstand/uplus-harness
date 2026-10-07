@@ -4,20 +4,18 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { BottomCTA, BottomCTASpacer } from "@/components/ui/BottomCTA";
 import { Button } from "@/components/ui/Button";
-import { CardPlan } from "@/components/ui/CardPlan";
 import { CautionNotice } from "@/components/ui/CautionNotice";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Header } from "@/components/ui/Header";
 import { IconDoneMark } from "@/components/ui/IconDoneMark";
 import { InlineError } from "@/components/ui/InlineError";
-import { ListRow } from "@/components/ui/ListRow";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Tag } from "@/components/ui/Tag";
 import { Toast } from "@/components/ui/Toast";
 import { clearLastSubscription, parseLastSubscription, readLastSubscriptionRaw } from "@/lib/last-subscription";
 import { formatDateTime, maskName, maskPhone } from "@/lib/mask";
 import { findPlan } from "@/lib/plan-data";
 import { PLAN_LIST_PATH, formatWon } from "@/lib/plan-display";
+import { ReceiptBox } from "./receipt-box";
 
 const HOME_LABEL = "처음으로";
 
@@ -117,28 +115,16 @@ export function CompleteView() {
         <IconDoneMark />
       </div>
       <Header type="root" title="요금제 변경 신청이 접수됐어요" />
-      <main className="flex flex-1 flex-col gap-24 px-16 pt-8 pb-24">
-        <section aria-label="신청 번호">
-          <ListRow
-            label="신청 번호"
-            divider={false}
-            value={
-              <>
-                <span>{sub.application_no}</span>
-                <Button type="Secondary" size="sm" label="복사" fullWidth={false} aria-label="신청 번호 복사" onClick={() => void onCopy()} />
-              </>
-            }
-          />
-        </section>
-
-        <CardPlan name={plan.name} price={formatWon(plan.promo_price)} />
-
-        <section aria-label="신청 내용" className="flex flex-col">
-          <ListRow label="이름" value={maskName(sub.name)} />
-          <ListRow label="휴대폰 번호" value={maskPhone(sub.phone)} />
-          <ListRow label="신청 일시" value={createdAt} />
-          <ListRow label="처리 상태" value={<Tag label="접수 완료" tone="accent" />} divider={false} />
-        </section>
+      <main className="flex flex-1 flex-col gap-24 px-16 pt-16 pb-24">
+        <ReceiptBox
+          applicationNo={sub.application_no}
+          planName={plan.name}
+          monthly={formatWon(plan.promo_price)}
+          maskedName={maskName(sub.name)}
+          maskedPhone={maskPhone(sub.phone)}
+          createdAt={createdAt}
+          onCopy={() => void onCopy()}
+        />
 
         <CautionNotice message="이 화면을 닫으면 신청 내용을 다시 조회할 수 없어요. 신청 번호를 복사해 두세요." />
       </main>

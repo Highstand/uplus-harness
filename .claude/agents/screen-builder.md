@@ -10,6 +10,7 @@ tools: Read, Grep, Glob, Write, Edit, Bash
 - `harness/02-pages.md` — 화면별 라우트 · 파일 · 컴포넌트 · 상태 · 이동
 - `harness/01-prd.md` — 문구 원문 · 요금제 데이터
 - `components/ui/**` — 쓸 수 있는 컴포넌트
+- `reference/make-export/src/App.tsx` — 화면 레이아웃 참고(화면 제목, 입력 라벨, 요약 영역 모양, 동의 행, 하단 버튼 배치). **코드는 복사하지 않고 구조만** 참고하며, 컴포넌트는 `components/ui`의 것만 쓴다. screens.md와 다른 점이 있으면 구현 전에 차이 목록을 오케스트레이터에게 보고하고 **사람의 확인을 받은 뒤** 반영한다.
 - Next.js 16: 코드를 쓰기 전에 `node_modules/next/dist/docs/`의 관련 문서를 먼저 확인한다.
 
 ## 출력
