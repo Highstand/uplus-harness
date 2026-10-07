@@ -47,8 +47,9 @@ export type CardPlanProps = {
 };
 
 /**
- * Card/Plan — Design.md 4장 (Name · Desc · Discount · Price · Original, Badge · Promo · Sale, State).
- * 폭 358(부모 폭 채움), 기본 높이 223 기준. 부가 정보는 기본으로 모두 꺼져 있다.
+ * Card/Plan — Design.md 4장 / Figma 23:434 (Name · Desc · Discount · Price · Original, Badge · Promo · Sale, State).
+ * 순서: Tag → 이름(subtitle/bold) → 설명(body/small-medium, text/secondary) → price-row(pt 8, 금액 Bold 18).
+ * 폭 358(부모 폭 채움). 부가 정보는 기본으로 모두 꺼져 있다. Tag는 Figma처럼 모두 회색 Tag.
  */
 export function CardPlan({
   name,
@@ -81,11 +82,11 @@ export function CardPlan({
     <>
       {(showTags || selected) && (
         <div className="flex flex-wrap items-center gap-4">
+          {badge && <Tag label={badgeLabel} />}
           {typeLabel !== undefined && <Tag label={typeLabel} />}
-          {badge && <Tag label={badgeLabel} tone="accent" />}
-          {sale && saleLabel && <Tag label={saleLabel} tone="accent" />}
+          {sale && saleLabel && <Tag label={saleLabel} />}
           {selected && (
-            <span className="ml-auto inline-flex items-center gap-4 text-caption-bold text-text-accent">
+            <span className="ml-auto inline-flex items-center gap-4 text-caption-bold text-text-primary">
               <IconCheck className="size-16" />
               선택됨
             </span>
@@ -93,39 +94,42 @@ export function CardPlan({
         </div>
       )}
 
-      <Heading className="text-heading-h4 text-text-primary">{name}</Heading>
+      <Heading className="text-subtitle-bold text-text-primary">{name}</Heading>
+
+      {desc !== undefined && <p className="text-body-small-medium text-text-secondary">{desc}</p>}
 
       {specs && specs.length > 0 && (
-        <dl className="flex flex-col gap-4 border-t border-border-subtle pt-12">
+        <dl className="flex flex-col gap-4">
           {specs.map((s) => (
             <div key={s.label} className="flex items-center justify-between gap-8">
-              <dt className="text-caption-medium text-text-tertiary">{s.label}</dt>
+              <dt className="text-body-small-medium text-text-secondary">{s.label}</dt>
               <dd className="text-body-small-strong text-text-primary">{s.value}</dd>
             </div>
           ))}
         </dl>
       )}
 
-      <div className="flex flex-col gap-4 border-t border-border-subtle pt-12">
-        {showPromo && <p className="text-caption-medium text-text-accent">{promoText}</p>}
+      <div className="flex flex-col items-start gap-4 pt-8">
         <div className="flex flex-wrap items-baseline gap-8">
           <span className="text-caption-medium text-text-tertiary">{priceLabel}</span>
-          {original !== undefined && (
-            <s className="text-caption-medium text-text-tertiary">{original}</s>
-          )}
-          {discount !== undefined && <span className="text-caption-bold text-text-accent">{discount}</span>}
-          <span className="text-heading-h3 text-text-primary">{price}</span>
+          {discount !== undefined && <span className="text-subtitle-bold text-text-accent">{discount}</span>}
+          <span className="text-subtitle-bold text-text-primary">{price}</span>
         </div>
+        {original !== undefined && <s className="text-caption-medium text-text-tertiary">{original}</s>}
         {priceCaption !== undefined && <p className="text-caption-medium text-text-tertiary">{priceCaption}</p>}
+        {showPromo && (
+          <p className="inline-flex h-[24px] items-center rounded-4 bg-bg-accent-subtle px-10 py-4 text-caption-bold text-icon-accent">
+            {promoText}
+          </p>
+        )}
       </div>
-
-      {desc !== undefined && <p className="text-body-small-medium text-text-secondary">{desc}</p>}
     </>
   );
 
+  // Figma 23:434 — 흰 배경, radius/16, p 20, gap 8. default 1px border/default · selected 1.5px border/medium
   const cls = [
-    "flex w-full flex-col gap-12 rounded-16 bg-bg-surface p-20 text-left",
-    selected ? "border-2 border-border-strong" : "border border-border-default",
+    "flex w-full flex-col gap-8 rounded-16 bg-bg-surface p-20 text-left",
+    selected ? "border-[1.5px] border-border-medium" : "border border-border-default",
     className,
   ].join(" ");
 

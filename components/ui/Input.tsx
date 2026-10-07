@@ -17,29 +17,31 @@ export type InputProps = Omit<ComponentPropsWithRef<"input">, "className"> & {
   className?: string;
 };
 
-// 테두리는 1px로 고정하고 강조 상태는 ring으로 한 겹 더해 글자 위치가 흔들리지 않게 한다
-const FRAME: Record<InputState, string> = {
-  default: "border-border-default bg-bg-surface",
-  focus: "border-border-focus ring-1 ring-border-focus bg-bg-surface",
-  filled: "border-border-strong bg-bg-surface",
-  caution: "border-border-error ring-1 ring-border-error bg-bg-error-subtle",
-  disabled: "border-border-subtle bg-fill-tertiary",
+// Figma 1:754 — 박스가 아닌 아래쪽 1.5px 밑줄형. 상태는 밑줄 색으로 구분한다
+const UNDERLINE: Record<InputState, string> = {
+  default: "border-border-default",
+  focus: "border-border-focus",
+  filled: "border-border-default",
+  caution: "border-border-error",
+  disabled: "border-border-default",
 };
 
+// icon 20px, 채운 원 + 느낌표 (Figma 메시지 행 아이콘)
 function ErrorIcon() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className="size-16 shrink-0 text-icon-error">
-      <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 4.5v4.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="8" cy="11.25" r="0.9" fill="currentColor" />
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="size-[20px] shrink-0 text-icon-error">
+      <circle cx="10" cy="10" r="8.5" fill="currentColor" />
+      <path d="M10 5.75v5" stroke="var(--color-icon-on-dark)" strokeWidth="1.75" strokeLinecap="round" />
+      <circle cx="10" cy="13.75" r="1.05" fill="var(--color-icon-on-dark)" />
     </svg>
   );
 }
 
 /**
  * Input — Design.md 4장 (State = default | focus | filled | caution | disabled, errorMessage).
- * 358 × 58, 오류 문구 노출 시 358 × 90. 나머지 input 속성(value, onChange, onBlur, maxLength, inputMode …)은 그대로 전달된다.
- * 오류는 테두리 색 + 아이콘 + 문구 + aria-invalid로 함께 전달한다.
+ * 358 × 58(흰 입력 영역 + 아래 1.5px 밑줄), 오류 문구 노출 시 358 × 90(간격 12 + 메시지 행 20).
+ * 글자 SemiBold 20px(heading/h4 크기 + 600). 나머지 input 속성(value, onChange, onBlur, maxLength, inputMode …)은 그대로 전달된다.
+ * 오류는 밑줄 색 + 아이콘 + 문구 + aria-invalid로 함께 전달한다.
  */
 export function Input({
   label,
@@ -67,30 +69,34 @@ export function Input({
   const showError = resolved === "caution" && !!errorMessage;
 
   return (
-    <div className={`flex w-full flex-col gap-8 ${className}`} data-state={resolved}>
+    <div className={`flex w-full flex-col gap-12 ${className}`} data-state={resolved}>
       <label htmlFor={inputId} className={showLabel ? "text-body-small-medium text-text-secondary" : "sr-only"}>
         {label}
       </label>
-      <input
-        id={inputId}
-        disabled={disabled || resolved === "disabled"}
-        value={value}
-        defaultValue={defaultValue}
-        aria-invalid={resolved === "caution" || undefined}
-        aria-describedby={showError ? errorId : undefined}
-        onFocus={(e) => {
-          setFocused(true);
-          onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setFocused(false);
-          onBlur?.(e);
-        }}
-        className={`h-[58px] w-full rounded-12 border px-16 text-body-medium text-text-primary outline-none transition-colors placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-on-disabled ${FRAME[resolved]}`}
-        {...rest}
-      />
+      <div
+        className={`flex h-[58px] w-full items-center border-b-[1.5px] bg-bg-surface py-12 pl-4 transition-colors ${UNDERLINE[resolved]}`}
+      >
+        <input
+          id={inputId}
+          disabled={disabled || resolved === "disabled"}
+          value={value}
+          defaultValue={defaultValue}
+          aria-invalid={resolved === "caution" || undefined}
+          aria-describedby={showError ? errorId : undefined}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+          className="h-full w-full min-w-[0px] bg-transparent text-heading-h4 font-[600] text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:bg-bg-default disabled:text-text-on-disabled"
+          {...rest}
+        />
+      </div>
       {showError && (
-        <p id={errorId} className="flex items-center gap-4 text-caption-medium text-text-error">
+        <p id={errorId} className="flex items-center gap-4 text-body-small-medium text-text-error">
           <ErrorIcon />
           <span>{errorMessage}</span>
         </p>

@@ -25,10 +25,14 @@ export type HeaderProps = {
   backLabel?: string;
 };
 
+// 아이콘은 24px 자리에 놓고, 터치 영역 40 × 40은 음수 여백으로 바깥까지 넓힌다 (Design.md icon/arrowLeft)
 const backBtnCls =
-  "-ml-8 inline-flex size-[40px] shrink-0 items-center justify-center rounded-full text-icon-strong hover:bg-bg-subtle focus-visible:outline-2 focus-visible:outline-border-focus";
+  "-m-8 inline-flex size-[40px] shrink-0 items-center justify-center rounded-full text-icon-strong hover:bg-bg-subtle focus-visible:outline-2 focus-visible:outline-border-focus";
 
-/** Header — Design.md 4장 (Type = default | root, Title). 390 × 56, 좌우 16px. 화면당 하나. */
+/**
+ * Header — Design.md 4장 / Figma 28:523 (Type = default | root, Title). 390 × 56, 흰 배경, px 16 · py 4, 테두리 없음. 화면당 하나.
+ * default: [arrowLeft 24][제목 가운데 subtitle/default][24 자리]. root: [제목 왼쪽 Bold 20 · 28][오른쪽 슬롯].
+ */
 export function Header({
   title,
   type = "default",
@@ -57,9 +61,9 @@ export function Header({
   if (type === "root") {
     return (
       <header className="w-full bg-bg-surface">
-        <div className="flex min-h-[56px] w-full items-center gap-8 px-16">
+        <div className="flex min-h-[56px] w-full items-center gap-12 px-16 py-4">
           {title !== undefined && (
-            <h1 className="min-w-[0px] flex-1 text-subtitle-bold text-text-primary">{title}</h1>
+            <h1 className="min-w-[0px] flex-1 text-heading-h4 font-[700] text-text-primary">{title}</h1>
           )}
           {right && <div className="ml-auto flex shrink-0 items-center">{right}</div>}
         </div>
@@ -69,11 +73,11 @@ export function Header({
   }
 
   return (
-    <header className="w-full border-b border-border-subtle bg-bg-surface">
-      <div className="relative flex h-[56px] w-full items-center gap-8 px-16">
-        <div className="flex min-w-[40px] shrink-0 items-center">{back}</div>
+    <header className="w-full bg-bg-surface">
+      <div className="flex h-[56px] w-full items-center gap-8 px-16 py-4">
+        <div className="flex min-w-[24px] shrink-0 items-center">{back}</div>
         <h1 className="min-w-[0px] flex-1 truncate text-center text-subtitle-default text-text-primary">{title}</h1>
-        <div className="flex min-w-[40px] shrink-0 items-center justify-end">{right}</div>
+        <div className="flex min-w-[24px] shrink-0 items-center justify-end">{right}</div>
       </div>
       {subtitle && <p className="px-16 pb-12 text-center text-body-small-medium text-text-secondary">{subtitle}</p>}
     </header>

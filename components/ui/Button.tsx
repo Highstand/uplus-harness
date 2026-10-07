@@ -29,24 +29,28 @@ export type ButtonProps = {
   className?: string;
 };
 
+// Figma 1:864: 모든 크기 radius/8 · px 24 · 글자 16px(body). 높이 sm 40(py 8) · lg 48(py 12) · xl 52(py 16)
 const SIZE: Record<ButtonSize, string> = {
-  sm: "h-[40px] px-12 gap-4 rounded-8 text-body-small-strong",
-  lg: "h-[48px] px-16 gap-8 rounded-12 text-body-strong",
-  xl: "h-[52px] px-20 gap-8 rounded-12 text-body-strong",
+  sm: "h-[40px] py-8",
+  lg: "h-[48px] py-12",
+  xl: "h-[52px] py-16",
 };
 
+// 테두리 1px은 모든 상태에 두고 색만 바꿔 크기가 흔들리지 않게 한다
 function toneClass(type: ButtonType, state: ButtonState) {
   if (state === "Disabled") {
-    return "bg-fill-disabled text-text-on-disabled border border-fill-disabled cursor-not-allowed";
+    // Primary Disabled는 Medium, Secondary Disabled는 SemiBold (둘 다 fill/disabled + text/on-dark, 테두리 없음)
+    const weight = type === "Primary" ? "text-body-medium" : "text-body-strong";
+    return `${weight} bg-fill-disabled text-text-on-dark border-fill-disabled cursor-not-allowed`;
   }
   if (type === "Primary") {
     return state === "Hover"
-      ? "bg-fill-primary-hover text-text-on-dark border border-fill-primary-hover"
-      : "bg-fill-primary text-text-on-dark border border-fill-primary hover:bg-fill-primary-hover hover:border-fill-primary-hover";
+      ? "text-body-strong bg-fill-primary-hover text-text-on-dark border-fill-primary-hover"
+      : "text-body-strong bg-fill-primary text-text-on-dark border-fill-primary hover:bg-fill-primary-hover hover:border-fill-primary-hover";
   }
   return state === "Hover"
-    ? "bg-bg-subtle text-text-primary border border-border-medium"
-    : "bg-bg-surface text-text-primary border border-border-default hover:bg-bg-subtle hover:border-border-medium";
+    ? "text-body-strong bg-bg-subtle text-text-primary border-border-default"
+    : "text-body-strong bg-bg-surface text-text-primary border-border-default hover:bg-bg-subtle";
 }
 
 function Spinner() {
@@ -58,7 +62,7 @@ function Spinner() {
   );
 }
 
-/** Button — Design.md 4장 (Type · Size · State, Label) + loading · href */
+/** Button — Design.md 4장 / Figma 1:864 (Type · Size · State, Label) + loading · href */
 export function Button({
   label,
   type = "Primary",
@@ -76,7 +80,7 @@ export function Button({
   const disabled = state === "Disabled" || loading;
   const visualState: ButtonState = disabled ? "Disabled" : state;
   const cls = [
-    "inline-flex items-center justify-center whitespace-nowrap transition-colors select-none",
+    "inline-flex items-center justify-center gap-8 whitespace-nowrap rounded-8 border px-24 transition-colors select-none",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus",
     SIZE[size],
     toneClass(type, visualState),

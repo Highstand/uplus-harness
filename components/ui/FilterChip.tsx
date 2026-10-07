@@ -1,7 +1,6 @@
 "use client";
 
 import type { KeyboardEvent, ReactNode } from "react";
-import { IconCheck } from "./IconCheck";
 
 export type FilterChipState = "default" | "selected";
 
@@ -16,16 +15,18 @@ export type FilterChipProps = {
 };
 
 /**
- * FilterChip — Design.md 4장 (State = default | selected, Label). 높이 40px, 너비 Hug.
- * 선택은 색 + icon/check + aria-checked로 함께 전달한다. FilterChipGroup(role="radiogroup") 안에서 쓴다.
+ * FilterChip — Design.md 4장 / Figma 28:528 (State = default | selected, Label). 높이 40px, 너비 Hug, px 16 · py 8, rounded full.
+ * default: 흰 배경 + border/default + body/small-medium. selected: fill/secondary(검정) + 흰 글자 body/small-strong.
+ * 선택은 배경 반전 + 글자 굵기 + aria-checked로 함께 전달한다. FilterChipGroup(role="radiogroup") 안에서 쓴다.
  */
 export function FilterChip({ label, state = "default", onClick, disabled = false }: FilterChipProps) {
   const selected = state === "selected";
+  const weight = selected ? "text-body-small-strong" : "text-body-small-medium";
   const tone = disabled
     ? "bg-fill-tertiary text-text-on-disabled border-border-subtle cursor-not-allowed"
     : selected
-      ? "bg-fill-secondary text-text-on-dark border-border-strong"
-      : "bg-bg-surface text-text-primary border-border-default hover:border-border-medium";
+      ? "bg-fill-secondary text-text-on-dark border-fill-secondary"
+      : "bg-bg-surface text-text-primary border-border-default hover:bg-bg-subtle";
 
   return (
     <button
@@ -36,11 +37,8 @@ export function FilterChip({ label, state = "default", onClick, disabled = false
       tabIndex={selected ? 0 : -1}
       data-chip
       onClick={onClick}
-      className={`inline-flex h-[40px] shrink-0 items-center gap-4 whitespace-nowrap rounded-full border px-16 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus ${
-        selected ? "pl-12 text-body-small-strong" : "text-body-small-medium"
-      } ${tone}`}
+      className={`inline-flex h-[40px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-16 py-8 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus ${weight} ${tone}`}
     >
-      {selected && <IconCheck className="size-16" />}
       <span>{label}</span>
     </button>
   );
