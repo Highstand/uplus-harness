@@ -8,7 +8,9 @@ docs/의 PRD·screens·Design·tokens를 읽어, screens.md의 화면을 Next.js
 
 기준 문서 우선순위: PRD > screens.md > flow.png. 문구는 PRD에 있으면 PRD 그대로.
 
-범위 밖: Supabase 저장, SQL, .env.local. 신청은 `lib/subscription.ts`의 `submitSubscription()`이 앱 안에서 `SUB-`+6자리 번호를 만들어 돌려주는 것까지. 완료 화면은 sessionStorage로 넘겨받은 1건을 이름 가운데·휴대폰 가운데 4자리를 가려 보여준다.
+범위 밖: SQL.
+
+M6 Supabase 연결: 신청 저장을 Supabase로 바꾼다. 고치는 곳은 `lib/subscription.ts`와 `app/api/**`뿐이다(화면 · components/ui · lib/plans.ts는 그대로). 키는 `.env.local`에 두고 커밋하지 않는다(.gitignore의 `.env*`). `submitSubscription()`은 `SUB-`+6자리 번호가 담긴 1건을 돌려주는 지금의 약속을 지킨다. 완료 화면은 그대로 sessionStorage로 넘겨받은 1건을 이름 가운데·휴대폰 가운데 4자리를 가려 보여준다.
 
 보호 경로(훅이 막음): docs/ · reference/ · app/tokens.css(→ `node checks/gen-tokens.mjs`로만 생성)
 
@@ -40,7 +42,7 @@ docs/의 PRD·screens·Design·tokens를 읽어, screens.md의 화면을 Next.js
 | 1 | @prd-reader | harness/01-prd.md | "페이즈 1 시작", "PRD 읽어줘" |
 | 2 | @page-splitter | harness/02-pages.md | "페이즈 2 시작", "화면 나눠줘" |
 | 3 | @theme-builder | 뼈대 파일, app/layout.tsx, app/globals.css, components/ui/** | "페이즈 3 시작", "토큰 적용해줘" |
-| 4 | @screen-builder | 5개 화면 page.tsx(+같은 폴더), lib/** | "페이즈 4 시작", "화면 만들어줘" |
+| 4 | @screen-builder | 5개 화면 page.tsx(+같은 폴더), lib/**, app/api/**(M6) | "페이즈 4 시작", "화면 만들어줘" |
 | 5 | @reviewer | 없음 (읽기 + 검사 실행 + O/X 체크리스트 보고) | "페이즈 5 시작", "검증해줘" |
 
 - 오케스트레이터(메인 대화)는 직접 구현하지 않는다. 페이즈마다 3장의 담당 에이전트를 부르고, 게이트 실행 · 기록 · 커밋 · 실패 시 되돌아갈 페이즈 판단만 한다.

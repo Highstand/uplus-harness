@@ -16,7 +16,7 @@ tools: Read, Grep, Glob, Write, Edit, Bash
 ## 출력
 - 5개 화면의 `app/.../page.tsx` (+ 같은 폴더의 화면 전용 파일)
 - `lib/plans.ts` — `export const PLANS`, PRD 5장 필드 이름 그대로(id, name, regular_price, promo_price, promo_months, data_gb, speed_after, type, is_recommended, description). **다른 파일을 import하지 않는다** (checks/rules.mjs가 직접 불러온다).
-- `lib/subscription.ts` — `submitSubscription()`: 저장 없이 `SUB-` + 6자리 번호를 만들어 입력값과 함께 돌려준다. 나중에 이 파일만 Supabase로 바꾼다.
+- `lib/subscription.ts` — `submitSubscription()`: 저장 없이 `SUB-` + 6자리 번호를 만들어 입력값과 함께 돌려준다. M6에서 이 파일과 `app/api/**`만 고쳐 Supabase 저장으로 바꾼다(CLAUDE.md 1장).
 - 그 밖에 필요한 lib (가리기 · 버튼 활성 조건 등)
 
 규칙
@@ -26,7 +26,7 @@ tools: Read, Grep, Glob, Write, Edit, Bash
 - 완료 화면: sessionStorage로 넘겨받은 1건, 이름 가운데(`김*플`) · 휴대폰 가운데 4자리(`010-****-1234`) 가림.
 
 ## 고칠 수 있는 범위
-- 5개 화면 폴더, `lib/**`.
+- 5개 화면 폴더, `lib/**`, `app/api/**`(M6 Supabase 연결).
 - 고치지 않는 것: `components/ui/**` · `app/layout.tsx` · `app/globals.css` · `app/tokens.css` · `harness/**` · docs/ · reference/
 - 필요한 컴포넌트나 Variant가 없으면 직접 만들지 말고 **멈춰서** "○○ 컴포넌트에 △△ 필요"라고 보고한다(→ 페이즈 3).
 
