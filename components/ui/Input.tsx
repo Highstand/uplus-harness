@@ -40,7 +40,7 @@ function ErrorIcon() {
 /**
  * Input — Design.md 4장 (State = default | focus | filled | caution | disabled, errorMessage).
  * 358 × 58(투명 입력 영역 + 아래 1.5px 밑줄, disabled만 bg/subtle), 오류 문구 노출 시 358 × 90(간격 12 + 메시지 행 20).
- * 글자 SemiBold 20px(heading/h4 크기 + 600). 나머지 input 속성(value, onChange, onBlur, maxLength, inputMode …)은 그대로 전달된다.
+ * 글자 body/strong(SemiBold 600 · 16px · 줄높이 24, 값·placeholder 공통). 나머지 input 속성(value, onChange, onBlur, maxLength, inputMode …)은 그대로 전달된다.
  * 오류는 밑줄 색 + 아이콘 + 문구 + aria-invalid로 함께 전달한다.
  */
 export function Input({
@@ -91,7 +91,7 @@ export function Input({
             setFocused(false);
             onBlur?.(e);
           }}
-          className="h-full w-full min-w-[0px] bg-transparent text-heading-h4 font-[600] text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-on-disabled"
+          className="h-full w-full min-w-[0px] bg-transparent text-body-strong text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-on-disabled"
           {...rest}
         />
       </div>
